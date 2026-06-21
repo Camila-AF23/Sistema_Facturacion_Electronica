@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+model categorias {
+  id_categoria     Int         @id @default(autoincrement())
+  nombre_categoria String      @db.VarChar(50)
+  id_tienda        Int
+  tiendas          tiendas     @relation(fields: [id_tienda], references: [id_tienda], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_tienda")
+  productos        productos[]
+
+  @@index([id_tienda], map: "id_tienda_idx")
+}
+
+model clientes {
+  id_cliente        Int       @id @default(autoincrement())
+  documento_cliente String    @unique(map: "documento_cliente_UNIQUE") @db.VarChar(20)
+  nombre_cliente    String    @db.VarChar(100)
+  telefono_cliente  String?   @db.VarChar(45)
+  correo_cliente    String    @db.VarChar(50)
+  id_tienda         Int
+  tiendas           tiendas   @relation(fields: [id_tienda], references: [id_tienda], onDelete: NoAction, onUpdate: NoAction, map: "fk_clientes_tienda")
+  factura           factura[]
+
+  @@index([id_tienda], map: "fk_clientes_tienda_idx")
+}
+
+model detalle_factura {
+  id_detalle      Int       @id @default(autoincrement())
+  cantidad        Decimal   @db.Decimal(10, 2)
+  precio_unitario Decimal   @db.Decimal(10, 2)
+  subtotal        Decimal   @db.Decimal(10, 2)
+  id_factura      Int
+  id_producto     Int
+  factura         factura   @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_factura")
+  productos       productos @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_producto")
+
+  @@index([id_factura], map: "Id_factura_idx")
+  @@index([id_producto], map: "Id_producto_idx")
+}
+
+model factura {
+  id_factura      Int               @id @default(autoincrement())
+  numero_factura  String            @unique(map: "numero_factura_UNIQUE") @db.VarChar(45)
+  fecha           DateTime          @db.DateTime(0)
+  total           Decimal           @db.Decimal(10, 2)
+  id_usuario      Int
+  id_cliente      Int
+  id_tienda       Int
+  id_pago         Int
+  detalle_factura detalle_factura[]
+  clientes        clientes          @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_cliente")
+  metodo_pago     metodo_pago       @relation(fields: [id_pago], references: [id_pago], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_pago")
+  tiendas         tiendas           @relation(fields: [id_tienda], references: [id_tienda], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_tienda")
+  usuarios        usuarios          @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_factura_usuario")
+
+  @@index([id_cliente], map: "Id_cliente_idx")
+  @@index([id_pago], map: "Id_pago_idx")
+  @@index([id_tienda], map: "id_tienda_idx")
+  @@index([id_usuario], map: "id_usuario_idx")
+}
+
+model metodo_pago {
+  id_pago   Int       @id @default(autoincrement())
+  tipo_pago String    @db.VarChar(50)
+  factura   factura[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model productos {
+  id_producto     Int               @id @default(autoincrement())
+  codigo_barras   String?           @db.VarChar(50)
+  nombre_producto String            @db.VarChar(100)
+  precio_compra   Decimal           @db.Decimal(10, 2)
+  precio_venta    Decimal           @db.Decimal(10, 2)
+  stock           Decimal           @db.Decimal(10, 2)
+  estado          Boolean           @default(true)
+  id_categoria    Int
+  id_tienda       Int
+  detalle_factura detalle_factura[]
+  categorias      categorias        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_producto_categoria")
+  tiendas         tiendas           @relation(fields: [id_tienda], references: [id_tienda], onDelete: NoAction, onUpdate: NoAction, map: "fk_producto_tienda")
+
+  @@index([id_categoria], map: "Id_Categoria_idx")
+  @@index([id_tienda], map: "id_tienda_idx")
+}
+
+model roles {
+  id_rol     Int        @id @default(autoincrement())
+  nombre_rol String     @db.VarChar(45)
+  usuarios   usuarios[]
+}
+
+model tiendas {
+  id_tienda        Int          @id @default(autoincrement())
+  nombre_tienda    String       @db.VarChar(100)
+  direccion_tienda String?      @db.VarChar(120)
+  telefono_tienda  String?      @db.VarChar(45)
+  correo           String       @db.VarChar(50)
+  nit              String       @unique(map: "nit_UNIQUE") @db.VarChar(20)
+  categorias       categorias[]
+  clientes         clientes[]
+  factura          factura[]
+  productos        productos[]
+  usuarios         usuarios[]
+}
+
+model usuarios {
+  id_usuario     Int       @id @default(autoincrement())
+  nombre         String    @db.VarChar(100)
+  documento      String    @unique(map: "cedula_UNIQUE") @db.VarChar(20)
+  fecha_registro DateTime  @db.Date
+  contrasena     String    @db.VarChar(250)
+  estado         Boolean   @default(true)
+  id_rol         Int
+  id_tienda      Int
+  factura        factura[]
+  roles          roles     @relation(fields: [id_rol], references: [id_rol], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_rol")
+  tiendas        tiendas   @relation(fields: [id_tienda], references: [id_tienda], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_tienda")
+
+  @@index([id_rol], map: "Id_rol_idx")
+  @@index([id_tienda], map: "id_tienda_idx")
+}

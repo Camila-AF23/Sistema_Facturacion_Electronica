@@ -16,6 +16,8 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const login_dto_1 = require("./dto/login.dto");
+const create_cajero_dto_1 = require("./dto/create-cajero.dto");
+const roles_guard_1 = require("./guards/roles.guard");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -23,6 +25,20 @@ let AuthController = class AuthController {
     }
     iniciarSesion(loginDto) {
         return this.authService.login(loginDto);
+    }
+    crearCajero(createCajeroDto, req) {
+        const idTiendaAdmin = req.user.id_tienda;
+        return this.authService.crearCajero(createCajeroDto, idTiendaAdmin);
+    }
+    listarCajeros(req) {
+        const idTiendaAdmin = req.user.id_tienda;
+        return this.authService.listarCajerosPorTienda(idTiendaAdmin);
+    }
+    editarCajero(id, body) {
+        return this.authService.editarCajero(Number(id), body);
+    }
+    eliminarCajero(id) {
+        return this.authService.eliminarCajero(Number(id));
     }
 };
 exports.AuthController = AuthController;
@@ -34,6 +50,40 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "iniciarSesion", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, common_1.Post)('cajeros'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_cajero_dto_1.CreateCajeroDto, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "crearCajero", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, common_1.Get)('cajeros'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "listarCajeros", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, common_1.Put)('cajeros/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "editarCajero", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, common_1.Delete)('cajeros/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "eliminarCajero", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

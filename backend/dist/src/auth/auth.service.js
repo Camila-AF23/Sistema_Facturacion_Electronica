@@ -58,14 +58,14 @@ let AuthService = class AuthService {
         const { documento, contrasena } = loginDto;
         const usuario = await this.prisma.usuarios.findUnique({
             where: { documento },
-            include: { roles: true },
+            include: { roles: true, tiendas: true },
         });
         if (!usuario || !usuario.estado) {
-            throw new common_1.UnauthorizedException('El documento ingresado no existe o el usuario está inactivo.');
+            throw new common_1.UnauthorizedException('Credenciales incorrectas');
         }
         const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena);
         if (!contrasenaValida) {
-            throw new common_1.UnauthorizedException('La contraseña ingresada es incorrecta.');
+            throw new common_1.UnauthorizedException('Credenciales incorrectas');
         }
         const payload = {
             sub: usuario.id_usuario,
@@ -76,15 +76,86 @@ let AuthService = class AuthService {
         };
         return {
             ok: true,
-            mensaje: '¡Inicio de sesión exitoso!',
+            mensaje: '¡Inicio exitoso!',
             user: {
                 id: usuario.id_usuario,
                 nombre: usuario.nombre,
                 rol: usuario.roles.nombre_rol,
                 id_tienda: usuario.id_tienda,
+                nombre_tienda: usuario.tiendas.nombre_tienda,
             },
             token: this.jwtService.sign(payload),
         };
+    }
+    async crearCajero(dto, idTienda) {
+        const usuarioExiste = await this.prisma.usuarios.findUnique({
+            where: { documento: dto.documento },
+        });
+        if (usuarioExiste)
+            throw new common_1.BadRequestException('El documento ya está registrado.');
+        const sal = await bcrypt.genSalt(10);
+        const contrasenaHasheada = await bcrypt.hash(dto.contrasena, sal);
+        return await this.prisma.usuarios.create({
+            data: {
+                nombre: dto.nombre,
+                documento: dto.documento,
+                contrasena: contrasenaHasheada,
+                fecha_registro: new Date(),
+                estado: true,
+                roles: {
+                    connect: { id_rol: 2 },
+                },
+                tiendas: {
+                    connect: { id_tienda: idTienda },
+                },
+            },
+        });
+    }
+    async listarCajerosPorTienda(idTienda) {
+        return await this.prisma.usuarios.findMany({
+            where: {
+                id_tienda: idTienda,
+                id_rol: 2,
+            },
+            select: {
+                id_usuario: true,
+                nombre: true,
+                documento: true,
+                estado: true,
+            },
+        });
+    }
+    async editarCajero(id, data) {
+        try {
+            if (data.contrasena) {
+                const sal = await bcrypt.genSalt(10);
+                data.contrasena = await bcrypt.hash(data.contrasena, sal);
+            }
+            return await this.prisma.usuarios.update({
+                where: { id_usuario: id },
+                data,
+            });
+        }
+        catch (error) {
+            if (error.code === 'P2025') {
+                throw new common_1.BadRequestException(`No se encontró ningún usuario con el ID ${id}.`);
+            }
+            throw error;
+        }
+    }
+    async eliminarCajero(id) {
+        try {
+            return await this.prisma.usuarios.update({
+                where: { id_usuario: id },
+                data: { estado: false },
+            });
+        }
+        catch (error) {
+            if (error.code === 'P2025') {
+                throw new common_1.BadRequestException(`No se encontró ningún usuario con el ID ${id} para eliminar.`);
+            }
+            throw error;
+        }
     }
 };
 exports.AuthService = AuthService;

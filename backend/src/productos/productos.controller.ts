@@ -1,34 +1,65 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
-import { UpdateProductoDto } from './dto/update-producto.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('productos')
+@UseGuards(JwtAuthGuard) // Protegido para usuarios logueados
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()
-  create(@Body() createProductoDto: CreateProductoDto) {
-    return this.productosService.create(createProductoDto);
+  crear(@Body() createProductoDto: CreateProductoDto, @Req() req: any) {
+    if (req.user.id_rol !== 1) {
+      throw new ForbiddenException(
+        'Solo los administradores pueden registrar productos.',
+      );
+    }
+    return this.productosService.crear(createProductoDto, req.user.id_tienda);
   }
 
   @Get()
-  findAll() {
-    return this.productosService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productosService.findOne(+id);
+  buscarTodos(@Req() req: any) {
+    // Admin y Cajero pueden buscar (Permiso total concedido aquí)
+    return this.productosService.buscarTodosPorTienda(req.user.id_tienda);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
-    return this.productosService.update(+id, updateProductoDto);
+  actualizar(
+    @Param('id') id: string,
+    @Body() updateDto: Partial<CreateProductoDto>,
+    @Req() req: any,
+  ) {
+    if (req.user.id_rol !== 1) {
+      throw new ForbiddenException(
+        'Solo los administradores pueden editar productos.',
+      );
+    }
+    return this.productosService.actualizar(
+      Number(id),
+      updateDto,
+      req.user.id_tienda,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productosService.remove(+id);
+  @Delete('/:id')
+  eliminar(@Param('id') id: string, @Req() req: any) {
+    if (req.user.id_rol !== 1) {
+      throw new ForbiddenException(
+        'Solo los administradores pueden eliminar productos.',
+      );
+    }
+    return this.productosService.eliminar(Number(id), req.user.id_tienda);
   }
 }

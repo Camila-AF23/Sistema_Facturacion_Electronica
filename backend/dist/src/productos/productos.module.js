@@ -10,13 +10,20 @@ exports.ProductosModule = void 0;
 const common_1 = require("@nestjs/common");
 const productos_service_1 = require("./productos.service");
 const productos_controller_1 = require("./productos.controller");
+const prisma_service_1 = require("../database/prisma.service");
+const jwt_1 = require("@nestjs/jwt");
 let ProductosModule = class ProductosModule {
 };
 exports.ProductosModule = ProductosModule;
 exports.ProductosModule = ProductosModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET,
+            }),
+        ],
         controllers: [productos_controller_1.ProductosController],
-        providers: [productos_service_1.ProductosService],
+        providers: [productos_service_1.ProductosService, prisma_service_1.PrismaService],
     })
 ], ProductosModule);
 //# sourceMappingURL=productos.module.js.map

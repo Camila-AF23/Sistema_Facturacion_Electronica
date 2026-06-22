@@ -10,9 +10,10 @@ import { RegistroModule } from './registro/registro.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { ProductosModule } from './productos/productos.module';
 import { ClientesModule } from './clientes/clientes.module';
+import { FacturasModule } from './facturas/facturas.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, RegistroModule, CategoriasModule, ProductosModule, ClientesModule], //AuthModule, ContactModule
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, RegistroModule, CategoriasModule, ProductosModule, ClientesModule, FacturasModule], //AuthModule, ContactModule
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

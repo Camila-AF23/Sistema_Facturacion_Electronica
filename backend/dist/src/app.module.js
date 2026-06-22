@@ -17,12 +17,13 @@ const registro_module_1 = require("./registro/registro.module");
 const categorias_module_1 = require("./categorias/categorias.module");
 const productos_module_1 = require("./productos/productos.module");
 const clientes_module_1 = require("./clientes/clientes.module");
+const facturas_module_1 = require("./facturas/facturas.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ isGlobal: true }), auth_module_1.AuthModule, registro_module_1.RegistroModule, categorias_module_1.CategoriasModule, productos_module_1.ProductosModule, clientes_module_1.ClientesModule],
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true }), auth_module_1.AuthModule, registro_module_1.RegistroModule, categorias_module_1.CategoriasModule, productos_module_1.ProductosModule, clientes_module_1.ClientesModule, facturas_module_1.FacturasModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })

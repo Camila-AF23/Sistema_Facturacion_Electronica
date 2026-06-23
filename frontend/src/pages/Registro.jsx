@@ -46,9 +46,8 @@ export default function Registro({ alCambiarVista }) {
 
       if (respuesta.data.ok) {
         alert(
-          `🎉 ${respuesta.data.mensaje}\nTienda: ${respuesta.data.tienda}\nAdmin: ${respuesta.data.administrador}`,
+          ` ${respuesta.data.mensaje}\nTienda: ${respuesta.data.tienda}\nAdmin: ${respuesta.data.administrador}`,
         );
-        // Si tienes una vista de Login, puedes redirigir aquí
         if (alCambiarVista) alCambiarVista("login");
       }
     } catch (err) {
@@ -74,7 +73,7 @@ export default function Registro({ alCambiarVista }) {
       }}
     >
       {/* Barra de Navegación superior basada en tu diseño */}
-      {/* Barra de Navegación superior optimizada con tu LOGO real */}
+
       <header
         style={{
           background: "#5c4033",

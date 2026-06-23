@@ -19,43 +19,43 @@ export declare class AuthService {
         token: string;
     }>;
     crearCajero(dto: CreateCajeroDto, idTienda: number): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
     listarCajerosPorTienda(idTienda: number): Promise<{
-        documento: string;
         id_usuario: number;
-        nombre: string;
         estado: boolean;
+        nombre: string;
+        documento: string;
     }[]>;
     editarCajero(id: number, data: {
         nombre?: string;
         estado?: boolean;
         contrasena?: string;
     }): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
     eliminarCajero(id: number): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
 }

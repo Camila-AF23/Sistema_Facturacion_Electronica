@@ -19,13 +19,13 @@ export declare class FacturasController {
             nombre: string;
         };
     } & {
+        id_tienda: number;
+        id_cliente: number;
         id_factura: number;
         numero_factura: string;
         fecha: Date;
         total: import("@prisma/client/runtime/library").Decimal;
         id_usuario: number;
-        id_cliente: number;
-        id_tienda: number;
         id_pago: number;
     })[]>;
     obtenerReporte(req: any, inicio: string, fin: string): Promise<{

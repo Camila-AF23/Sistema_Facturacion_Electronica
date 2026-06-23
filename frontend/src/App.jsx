@@ -4,12 +4,14 @@ import Login from "./pages/Login";
 import GestionCajeros from "./pages/GestionCajeros";
 import GestionCategorias from "./pages/GestionCategorias";
 import GestionProductos from "./pages/GestionProductos";
+import GestionRecibos from "./pages/GestionRecibos";
+import GestionClientes from "./pages/GestionClientes";
 
 export default function App() {
   const [vistaActual, setVistaActual] = useState("login");
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
 
-  // Sub-navegación dentro del Dashboard: 'perfil', 'inventario', 'categorias', 'recibos', 'empleados'
+  // Sub-navegación dentro del Dashboard:
   const [subVista, setSubVista] = useState("perfil");
 
   const manejarAutenticacion = (user) => {
@@ -94,17 +96,27 @@ export default function App() {
                 Recibos
               </span>
 
-              {/* CRUCIAL: El módulo de empleados/cajeros SÓLO aparece si el rol es Administrador */}
+              <span
+                onClick={() => setSubVista("clientes")}
+                style={{
+                  cursor: "pointer",
+                  opacity: subVista === "clientes" ? 1 : 0.6,
+                }}
+              >
+                Clientes
+              </span>
+
+              {/* El módulo de empleados/cajeros SÓLO aparece si el rol es Administrador */}
               {usuarioLogueado?.rol === "Administrador" && (
                 <span
                   onClick={() => setSubVista("empleados")}
                   style={{
                     cursor: "pointer",
-                    color: "#ffcc99",
+                    color: "#fdf8f5",
                     opacity: subVista === "empleados" ? 1 : 0.7,
                   }}
                 >
-                  Gestionar Cajas
+                  Cajas
                 </span>
               )}
             </nav>
@@ -133,41 +145,131 @@ export default function App() {
               <div
                 style={{
                   background: "white",
-                  padding: "20px",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                  padding: "40px 30px",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(92, 64, 51, 0.15)",
+                  maxWidth: "550px",
+                  margin: "40px auto",
+                  textAlign: "center",
+                  borderTop: "6px solid #5c4033", // Línea superior con el tono café de tu marca
                 }}
               >
-                <h3>Datos de la Sesión</h3>
-                <p>
-                  <b>Funcionario:</b> {usuarioLogueado?.nombre}
-                </p>
-                <p>
-                  <b>Rol asignado:</b> {usuarioLogueado?.rol}
-                </p>
-                <p>
-                  <b>Código de establecimiento:</b> #
-                  {usuarioLogueado?.id_tienda}
-                </p>
+                {/* Avatar o Icono Representativo */}
+                <div
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    background: "#fdf8f5",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 20px auto",
+                    border: "2px solid #5c4033",
+                    fontSize: "32px",
+                  }}
+                >
+                  👤
+                </div>
+
+                <h3
+                  style={{
+                    color: "#5c4033",
+                    margin: "0 0 5px 0",
+                    fontSize: "24px",
+                  }}
+                >
+                  {usuarioLogueado?.nombre}
+                </h3>
+
+                <span
+                  style={{
+                    background:
+                      usuarioLogueado?.rol === "Administrador"
+                        ? "#5c4033"
+                        : "#8b5a2b",
+                    color: "white",
+                    padding: "4px 12px",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  {usuarioLogueado?.rol}
+                </span>
+
+                <hr
+                  style={{
+                    border: "0",
+                    borderTop: "1px solid #eee",
+                    margin: "25px 0",
+                  }}
+                />
+
+                {/* Datos del Establecimiento */}
+                <div
+                  style={{
+                    textAlign: "left",
+                    background: "#fdf8f5",
+                    padding: "15px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <p
+                    style={{ margin: "5px 0", color: "#666", fontSize: "14px" }}
+                  >
+                    <b style={{ color: "#5c4033" }}>
+                      Establecimiento asignado:
+                    </b>
+                  </p>
+                  <p
+                    style={{
+                      margin: "0 0 10px 0",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      color: "#333",
+                    }}
+                  >
+                    🏢 {usuarioLogueado?.nombre_tienda || "Sede Principal"}
+                  </p>
+
+                  <p
+                    style={{
+                      margin: "10px 0 5px 0",
+                      color: "#666",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <b style={{ color: "#5c4033" }}>Estado del Turno:</b>
+                  </p>
+                  <p
+                    style={{
+                      margin: "0",
+                      fontSize: "14px",
+                      color: "green",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Conectado y Activo
+                  </p>
+                </div>
               </div>
             )}
 
-            {/* 2. INYECTAMOS EL COMPONENTE DE PRODUCTOS EN LA SUB-VISTA DE INVENTARIO */}
             {subVista === "inventario" && <GestionProductos />}
 
             {subVista === "categorias" && <GestionCategorias />}
 
-            {subVista === "recibos" && (
-              <div>
-                <h3>Facturación y Recibos</h3>
-                <p>
-                  Módulo de emisión de facturas electrónicas (Próximamente
-                  código).
-                </p>
-              </div>
+            {subVista === "clientes" && (
+              <GestionClientes usuarioLogueado={usuarioLogueado} />
             )}
 
-            {/* Renderización condicionada de la vista de Cajeros */}
+            {subVista === "recibos" && (
+              <GestionRecibos usuarioLogueado={usuarioLogueado} />
+            )}
+
             {subVista === "empleados" &&
               usuarioLogueado?.rol === "Administrador" && <GestionCajeros />}
           </main>

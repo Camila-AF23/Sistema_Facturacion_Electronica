@@ -5,6 +5,13 @@ export default function GestionCajeros() {
   const [cajeros, setCajeros] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [mostrarModalEdit, setMostrarModalEdit] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [cajeroAEditar, setCajeroAEditar] = useState({
+    id_usuario: null,
+    nombre: "",
+    contrasena: "",
+  });
 
   // Estado para el formulario de nuevo cajero (Basado en CreateCajeroDto)
   const [nuevoCajero, setNuevoCajero] = useState({
@@ -47,8 +54,8 @@ export default function GestionCajeros() {
     }
   };
 
-  // 3. Eliminar lógicamente un cajero (Cambiar estado a false)
-  const handleEliminarCajero = async (id) => {
+  // 3. Desactiva un cajero (Cambiar estado a false)
+  const handleDesactivarCajero = async (id) => {
     if (!confirm("¿Está seguro de que desea desactivar este cajero?")) return;
     try {
       // Endpoint: @Delete('cajeros/:id')
@@ -56,9 +63,41 @@ export default function GestionCajeros() {
       alert("Cajero desactivado del sistema.");
       obtenerCajeros();
     } catch (err) {
-      alert("Error al intentar eliminar.");
+      alert("Error al intentar desactivar.");
     }
   };
+
+  // 4. Manejar la edición de un cajero (nombre y contraseña)
+  const handleEditarCajero = async (e) => {
+    e.preventDefault();
+
+    try {
+      const payload = {
+        nombre: cajeroAEditar.nombre,
+      };
+
+      if (cajeroAEditar.contrasena.trim()) {
+        payload.contrasena = cajeroAEditar.contrasena;
+      }
+
+      await clienteAxios.put(
+        `/auth/cajeros/${cajeroAEditar.id_usuario}`,
+        payload,
+      );
+
+      alert("Cajero actualizado correctamente");
+
+      setMostrarModalEdit(false);
+
+      obtenerCajeros();
+    } catch (err) {
+      alert(err.response?.data?.message || "Error al actualizar cajero");
+    }
+  };
+
+  const cajerosFiltrados = cajeros.filter((cajero) =>
+    cajero.nombre.toLowerCase().includes(busqueda.toLowerCase()),
+  );
 
   return (
     <div style={{ padding: "10px 20px", fontFamily: "sans-serif" }}>
@@ -75,6 +114,8 @@ export default function GestionCajeros() {
           <input
             type="text"
             placeholder="Buscar cajero ..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
             style={{
               width: "100%",
               padding: "10px 15px",
@@ -186,7 +227,7 @@ export default function GestionCajeros() {
         <p>Cargando lista de cajeros...</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          {cajeros.map((cajero) => (
+          {cajerosFiltrados.map((cajero) => (
             <div
               key={cajero.id_usuario}
               style={{
@@ -212,8 +253,11 @@ export default function GestionCajeros() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    fontSize: "32px",
                   }}
-                ></div>
+                >
+                  👤
+                </div>
                 <div>
                   <h3 style={{ margin: "0 0 5px 0", color: "#2b1d15" }}>
                     {cajero.nombre}
@@ -251,11 +295,15 @@ export default function GestionCajeros() {
                 }}
               >
                 <button
-                  onClick={() =>
-                    alert(
-                      "Función para editar datos básicos o cambiar contraseña",
-                    )
-                  }
+                  onClick={() => {
+                    setCajeroAEditar({
+                      id_usuario: cajero.id_usuario,
+                      nombre: cajero.nombre,
+                      contrasena: "",
+                    });
+
+                    setMostrarModalEdit(true);
+                  }}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -273,7 +321,7 @@ export default function GestionCajeros() {
                   Editar Datos / Clave
                 </button>
                 <button
-                  onClick={() => handleEliminarCajero(cajero.id_usuario)}
+                  onClick={() => handleDesactivarCajero(cajero.id_usuario)}
                   disabled={!cajero.estado}
                   style={{
                     display: "flex",
@@ -294,11 +342,102 @@ export default function GestionCajeros() {
               </div>
             </div>
           ))}
-          {cajeros.length === 0 && (
+          {cajerosFiltrados.length === 0 && (
             <p style={{ textAlign: "center", color: "#666" }}>
               No hay cajeros registrados para esta tienda.
             </p>
           )}
+        </div>
+      )}
+      {mostrarModalEdit && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <form
+            onSubmit={handleEditarCajero}
+            style={{
+              background: "#f9f3ee",
+              padding: "25px",
+              borderRadius: "20px",
+              width: "450px",
+            }}
+          >
+            <h3>Editar Cajero</h3>
+
+            <label>Nombre</label>
+
+            <input
+              type="text"
+              value={cajeroAEditar.nombre}
+              onChange={(e) =>
+                setCajeroAEditar({
+                  ...cajeroAEditar,
+                  nombre: e.target.value,
+                })
+              }
+              style={inputEstilo}
+            />
+
+            <label>Nueva contraseña</label>
+
+            <input
+              type="password"
+              placeholder="Dejar vacío para no cambiar"
+              value={cajeroAEditar.contrasena}
+              onChange={(e) =>
+                setCajeroAEditar({
+                  ...cajeroAEditar,
+                  contrasena: e.target.value,
+                })
+              }
+              style={inputEstilo}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setMostrarModalEdit(false)}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "10px",
+                }}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "10px",
+                  background: "#5c4033",
+                  color: "white",
+                  border: "none",
+                }}
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

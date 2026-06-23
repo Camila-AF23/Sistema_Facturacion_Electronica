@@ -99,6 +99,7 @@ export class AuthService {
       where: {
         id_tienda: idTienda,
         id_rol: 2,
+        estado: true, // Solo cajeros activos
       },
       select: {
         id_usuario: true,

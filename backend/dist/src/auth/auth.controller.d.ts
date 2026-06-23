@@ -17,43 +17,43 @@ export declare class AuthController {
         token: string;
     }>;
     crearCajero(createCajeroDto: CreateCajeroDto, req: any): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
     listarCajeros(req: any): Promise<{
-        documento: string;
         id_usuario: number;
-        nombre: string;
         estado: boolean;
+        nombre: string;
+        documento: string;
     }[]>;
     editarCajero(id: string, body: {
         nombre?: string;
         estado?: boolean;
         contrasena?: string;
     }): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
     eliminarCajero(id: string): Promise<{
-        documento: string;
-        contrasena: string;
+        id_tienda: number;
         id_usuario: number;
-        nombre: string;
-        fecha_registro: Date;
         estado: boolean;
         id_rol: number;
-        id_tienda: number;
+        nombre: string;
+        documento: string;
+        fecha_registro: Date;
+        contrasena: string;
     }>;
 }

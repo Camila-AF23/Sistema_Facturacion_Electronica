@@ -116,6 +116,7 @@ let AuthService = class AuthService {
             where: {
                 id_tienda: idTienda,
                 id_rol: 2,
+                estado: true,
             },
             select: {
                 id_usuario: true,

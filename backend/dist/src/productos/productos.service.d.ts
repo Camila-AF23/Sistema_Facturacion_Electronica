@@ -4,53 +4,53 @@ export declare class ProductosService {
     private prisma;
     constructor(prisma: PrismaService);
     crear(dto: CreateProductoDto, idTienda: number): Promise<{
-        estado: boolean;
-        id_tienda: number;
         id_categoria: number;
+        id_tienda: number;
+        id_producto: number;
         codigo_barras: string | null;
         nombre_producto: string;
         precio_compra: import("@prisma/client/runtime/library").Decimal;
         precio_venta: import("@prisma/client/runtime/library").Decimal;
         stock: import("@prisma/client/runtime/library").Decimal;
-        id_producto: number;
+        estado: boolean;
     }>;
     buscarTodosPorTienda(idTienda: number): Promise<({
         categorias: {
-            id_tienda: number;
-            nombre_categoria: string;
             id_categoria: number;
+            nombre_categoria: string;
+            id_tienda: number;
         };
     } & {
-        estado: boolean;
-        id_tienda: number;
         id_categoria: number;
+        id_tienda: number;
+        id_producto: number;
         codigo_barras: string | null;
         nombre_producto: string;
         precio_compra: import("@prisma/client/runtime/library").Decimal;
         precio_venta: import("@prisma/client/runtime/library").Decimal;
         stock: import("@prisma/client/runtime/library").Decimal;
-        id_producto: number;
+        estado: boolean;
     })[]>;
     actualizar(id: number, dto: Partial<CreateProductoDto>, idTienda: number): Promise<{
-        estado: boolean;
-        id_tienda: number;
         id_categoria: number;
+        id_tienda: number;
+        id_producto: number;
         codigo_barras: string | null;
         nombre_producto: string;
         precio_compra: import("@prisma/client/runtime/library").Decimal;
         precio_venta: import("@prisma/client/runtime/library").Decimal;
         stock: import("@prisma/client/runtime/library").Decimal;
-        id_producto: number;
+        estado: boolean;
     }>;
     eliminar(id: number, idTienda: number): Promise<{
-        estado: boolean;
-        id_tienda: number;
         id_categoria: number;
+        id_tienda: number;
+        id_producto: number;
         codigo_barras: string | null;
         nombre_producto: string;
         precio_compra: import("@prisma/client/runtime/library").Decimal;
         precio_venta: import("@prisma/client/runtime/library").Decimal;
         stock: import("@prisma/client/runtime/library").Decimal;
-        id_producto: number;
+        estado: boolean;
     }>;
 }
